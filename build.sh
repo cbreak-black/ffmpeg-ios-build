@@ -1,22 +1,19 @@
 #!/bin/sh
 
-PLATFORM=/Developer4/Platforms/iPhoneOS.platform
-IOSSDK=iPhoneOS5.0
+PLATFORMBASE=$(xcode-select -print-path)"/Platforms"
+IOSSDKVERSION=5.0
 
 set -e
 
 SCRIPT_DIR=$( (cd -P $(dirname $0) && pwd) )
 DIST_DIR_BASE=${DIST_DIR_BASE:="$SCRIPT_DIR/dist"}
 
-if [ -d ffmpeg ]
+if [ ! -d ffmpeg ]
 then
-  echo "Found ffmpeg source directory, no need to fetch from git..."
-else
-  echo "Fetching ffmpeg from git://git.videolan.org/ffmpeg.git..."
-  git clone git://git.videolan.org/ffmpeg.git
+  echo "ffmpeg source directory does not exist, run sync.sh"
 fi
 
-ARCHS=${ARCHS:-"armv6 armv7"}
+ARCHS=${ARCHS:-"armv6 armv7 i386"}
 
 for ARCH in $ARCHS
 do
@@ -38,14 +35,25 @@ do
             EXTRA_FLAGS="--enable-cross-compile --target-os=darwin --arch=arm --cpu=arm1176jzf-s"
             EXTRA_CFLAGS="-arch $ARCH"
             EXTRA_LDFLAGS="-arch $ARCH"
+            EXTRA_CC_FLAGS="-arch $ARCH"
+            PLATFORM="${PLATFORMBASE}/iPhoneOS.platform"
+            IOSSDK=iPhoneOS${IOSSDKVERSION}
             ;;
         armv7)
             EXTRA_FLAGS="--enable-cross-compile --target-os=darwin --arch=arm --cpu=cortex-a8 --enable-pic"
             EXTRA_CFLAGS="-arch $ARCH"
             EXTRA_LDFLAGS="-arch $ARCH"
+            EXTRA_CC_FLAGS="-arch $ARCH"
+            PLATFORM="${PLATFORMBASE}/iPhoneOS.platform"
+            IOSSDK=iPhoneOS${IOSSDKVERSION}
             ;;
-        x86_64)
-            EXTRA_CC_FLAGS="-mdynamic-no-pic"
+        i386)
+            EXTRA_FLAGS="--enable-cross-compile --target-os=darwin --arch=$ARCH --enable-pic"
+            EXTRA_CFLAGS="-arch $ARCH"
+            EXTRA_LDFLAGS="-arch $ARCH"
+            EXTRA_CC_FLAGS="-arch $ARCH -mdynamic-no-pic"
+            PLATFORM="${PLATFORMBASE}/iPhoneSimulator.platform"
+            IOSSDK=iPhoneSimulator${IOSSDKVERSION}
             ;;
     esac
 

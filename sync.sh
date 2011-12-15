@@ -13,7 +13,7 @@ else
   git submodule update --init ffmpeg
 fi
 
-ARCHS=${ARCHS:-"armv6 armv7"}
+ARCHS=${ARCHS:-"armv6 armv7 i386"}
 
 for ARCH in $ARCHS
 do
