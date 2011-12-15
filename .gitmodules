@@ -1,0 +1,6 @@
+[submodule "gas-preprocessor"]
+	path = gas-preprocessor
+	url = git://github.com/yuvi/gas-preprocessor.git
+[submodule "ffmpeg"]
+	path = ffmpeg
+	url = git://git.videolan.org/ffmpeg.git
