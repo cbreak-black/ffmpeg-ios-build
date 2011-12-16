@@ -61,7 +61,6 @@ do
     ./configure \
     --prefix=$DIST_DIR \
     --extra-ldflags=-L${PLATFORM}/Developer/SDKs/${IOSSDK}.sdk/usr/lib/system \
-    --disable-asm \
     --disable-bzlib \
     --disable-doc \
     --disable-ffmpeg \
