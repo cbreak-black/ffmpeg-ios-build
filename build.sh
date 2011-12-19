@@ -13,7 +13,8 @@ then
   echo "ffmpeg source directory does not exist, run sync.sh"
 fi
 
-ARCHS=${ARCHS:-"armv6 armv7 i386"}
+#ARCHS=${ARCHS:-"armv6 armv7 i386"}
+ARCHS=${ARCHS:-"armv7 i386"}
 
 for ARCH in $ARCHS
 do
@@ -32,34 +33,32 @@ do
 
     case $ARCH in
         armv6)
-            EXTRA_FLAGS="--enable-cross-compile --target-os=darwin --arch=arm --cpu=arm1176jzf-s"
-            EXTRA_CFLAGS="-arch $ARCH"
-            EXTRA_LDFLAGS="-arch $ARCH"
-            EXTRA_CC_FLAGS="-arch $ARCH"
+            EXTRA_FLAGS="--cpu=arm1176jzf-s"
             PLATFORM="${PLATFORMBASE}/iPhoneOS.platform"
             IOSSDK=iPhoneOS${IOSSDKVERSION}
             ;;
         armv7)
-            EXTRA_FLAGS="--enable-cross-compile --target-os=darwin --arch=arm --cpu=cortex-a8 --enable-pic"
-            EXTRA_CFLAGS="-arch $ARCH"
-            EXTRA_LDFLAGS="-arch $ARCH"
-            EXTRA_CC_FLAGS="-arch $ARCH"
+            EXTRA_FLAGS="--cpu=cortex-a8 --enable-pic"
             PLATFORM="${PLATFORMBASE}/iPhoneOS.platform"
             IOSSDK=iPhoneOS${IOSSDKVERSION}
             ;;
         i386)
-            EXTRA_FLAGS="--enable-cross-compile --target-os=darwin --arch=$ARCH --enable-pic"
-            EXTRA_CFLAGS="-arch $ARCH"
-            EXTRA_LDFLAGS="-arch $ARCH"
-            EXTRA_CC_FLAGS="-arch $ARCH -mdynamic-no-pic"
+            EXTRA_FLAGS="--enable-pic"
             PLATFORM="${PLATFORMBASE}/iPhoneSimulator.platform"
             IOSSDK=iPhoneSimulator${IOSSDKVERSION}
+            ;;
+        *)
+            echo "Unsupported architecture ${ARCH}"
+            exit 1
             ;;
     esac
 
     echo "Configuring ffmpeg for $ARCH..."
     ./configure \
     --prefix=$DIST_DIR \
+    --enable-cross-compile --target-os=darwin --arch=$ARCH \
+    --cross-prefix="${PLATFORM}/Developer/usr/bin/" \
+    --sysroot="${PLATFORM}/Developer/SDKs/${IOSSDK}.sdk" \
     --extra-ldflags=-L${PLATFORM}/Developer/SDKs/${IOSSDK}.sdk/usr/lib/system \
     --disable-bzlib \
     --disable-doc \
@@ -67,16 +66,16 @@ do
     --disable-ffplay \
     --disable-ffserver \
     --disable-ffprobe \
-    --cc=${PLATFORM}/Developer/usr/bin/gcc \
-    --cxx=${PLATFORM}/Developer/usr/bin/g++ \
-    --as="gas-preprocessor.pl ${PLATFORM}/Developer/usr/bin/gcc" \
-    --sysroot=${PLATFORM}/Developer/SDKs/${IOSSDK}.sdk \
-    --extra-ldflags="$EXTRA_LDFLAGS" \
-    --extra-cflags="$EXTRA_CFLAGS" \
+    --as="gas-preprocessor.pl ${PLATFORM}/Developer/usr/bin/as" \
+    --extra-ldflags="-arch $ARCH" \
+    --extra-cflags="-arch $ARCH" \
+    --extra-cxxflags="-arch $ARCH" \
     $EXTRA_FLAGS
 
     echo "Installing ffmpeg for $ARCH..."
-    make clean && make -j8 && make install
+    make clean
+    make -j8 V=1
+    make install
 
     cd $SCRIPT_DIR
 

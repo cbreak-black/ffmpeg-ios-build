@@ -1,0 +1,16 @@
+USAGE
+
+Run ./sync.sh, ./build.sh and ./combine.sh as appropriate. It is probably
+needed to change some variables in ./build.sh and maybe ./sync.sh.
+
+To find out which SDKs are supported run:
+xcodebuild -showsdks
+
+To switch which XCode Installation is used, run
+sudo xcode-select -switch $XCODEROOT
+
+
+CREDITS
+
+This code is partially taken from the answer to this SO Question:
+http://stackoverflow.com/questions/7007305/
