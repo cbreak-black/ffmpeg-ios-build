@@ -19,11 +19,11 @@ ARCHS=${ARCHS:-"armv7 i386"}
 for ARCH in $ARCHS
 do
     FFMPEG_DIR=ffmpeg-$ARCH
-    if [ -d $FFMPEG_DIR ]
+    echo "Syncing source for $ARCH to directory $FFMPEG_DIR"
+    rsync ffmpeg/ $FFMPEG_DIR/ --exclude '.*' -a --delete
+    if [ -d patches ]
     then
-      echo "Removing old directory $FFMPEG_DIR"
-      rm -rf $FFMPEG_DIR
+        echo "Applying patches to source in directory $FFMPEG_DIR"
+        git apply -v --directory=$FFMPEG_DIR patches/*
     fi
-    echo "Copying source for $ARCH to directory $FFMPEG_DIR"
-    cp -a ffmpeg $FFMPEG_DIR
 done

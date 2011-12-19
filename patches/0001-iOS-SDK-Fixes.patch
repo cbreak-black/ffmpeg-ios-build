@@ -1,0 +1,60 @@
+From 185c3298e20acf54c2bb0643220cc60ce6c9c98e Mon Sep 17 00:00:00 2001
+From: Gerhard Roethlin <gerhard@disneyresearch.com>
+Date: Mon, 19 Dec 2011 11:28:07 +0100
+Subject: [PATCH] iOS SDK Fixes
+
+Fix problems when compiling ffmpeg with apple's iOS SDK, maybe
+caused by the old compiler shipped with it. The solution is
+similar to that in commit f7de5235.
+---
+ libavutil/arm/intmath.h      |    4 ++++
+ libavutil/arm/intreadwrite.h |    4 ++++
+ 2 files changed, 8 insertions(+), 0 deletions(-)
+
+diff --git a/libavutil/arm/intmath.h b/libavutil/arm/intmath.h
+index 52af66e..9bd5d4d 100644
+--- a/libavutil/arm/intmath.h
++++ b/libavutil/arm/intmath.h
+@@ -97,6 +97,8 @@ static av_always_inline av_const int FASTDIV(int a, int b)
+ 
+ #endif /* HAVE_ARMV6 */
+ 
++#if AV_GCC_VERSION_AT_LEAST(4,4)
++
+ #define av_clipl_int32 av_clipl_int32_arm
+ static av_always_inline av_const int32_t av_clipl_int32_arm(int64_t a)
+ {
+@@ -110,6 +112,8 @@ static av_always_inline av_const int32_t av_clipl_int32_arm(int64_t a)
+     return x;
+ }
+ 
++#endif
++
+ #endif /* HAVE_INLINE_ASM */
+ 
+ #endif /* AVUTIL_ARM_INTMATH_H */
+diff --git a/libavutil/arm/intreadwrite.h b/libavutil/arm/intreadwrite.h
+index 0292aab..f758994 100644
+--- a/libavutil/arm/intreadwrite.h
++++ b/libavutil/arm/intreadwrite.h
+@@ -52,6 +52,8 @@ static av_always_inline void AV_WN32(void *p, uint32_t v)
+     __asm__ ("str  %1, %0" : "=m"(*(uint32_t *)p) : "r"(v));
+ }
+ 
++#if AV_GCC_VERSION_AT_LEAST(4,4)
++
+ #define AV_RN64 AV_RN64
+ static av_always_inline uint64_t AV_RN64(const void *p)
+ {
+@@ -72,6 +74,8 @@ static av_always_inline void AV_WN64(void *p, uint64_t v)
+              : "r"(v));
+ }
+ 
++#endif
++
+ #endif /* HAVE_INLINE_ASM */
+ 
+ #endif /* AVUTIL_ARM_INTREADWRITE_H */
+-- 
+1.7.8.rc3.17.gf56ef1
+
