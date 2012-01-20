@@ -34,16 +34,19 @@ do
     case $ARCH in
         armv6)
             EXTRA_FLAGS="--cpu=arm1176jzf-s"
+            EXTRA_CFLAGS=""
             PLATFORM="${PLATFORMBASE}/iPhoneOS.platform"
             IOSSDK=iPhoneOS${IOSSDKVERSION}
             ;;
         armv7)
             EXTRA_FLAGS="--cpu=cortex-a8 --enable-pic"
+            EXTRA_CFLAGS="-mfpu=neon"
             PLATFORM="${PLATFORMBASE}/iPhoneOS.platform"
             IOSSDK=iPhoneOS${IOSSDKVERSION}
             ;;
         i386)
             EXTRA_FLAGS="--enable-pic"
+            EXTRA_CFLAGS=""
             PLATFORM="${PLATFORMBASE}/iPhoneSimulator.platform"
             IOSSDK=iPhoneSimulator${IOSSDKVERSION}
             ;;
@@ -68,7 +71,7 @@ do
     --disable-ffprobe \
     --as="gas-preprocessor.pl ${PLATFORM}/Developer/usr/bin/as" \
     --extra-ldflags="-arch $ARCH" \
-    --extra-cflags="-arch $ARCH" \
+    --extra-cflags="-arch $ARCH $EXTRA_CFLAGS" \
     --extra-cxxflags="-arch $ARCH" \
     $EXTRA_FLAGS
 
