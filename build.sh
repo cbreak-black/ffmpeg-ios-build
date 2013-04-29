@@ -22,8 +22,6 @@ fi
 
 PATH=${SCRIPT_DIR}/gas-preprocessor/:$PATH
 
-echo $PATH
-
 for ARCH in $ARCHS
 do
     FFMPEG_DIR=ffmpeg-$ARCH
@@ -44,25 +42,25 @@ do
             EXTRA_FLAGS="--cpu=arm1176jzf-s"
             EXTRA_CFLAGS=""
             PLATFORM="${PLATFORMBASE}/iPhoneOS.platform"
-            IOSSDK=iPhoneOS${IOSSDKVERSION}
+            IOSSDK=iPhoneOS${IOSSDK_VER}
             ;;
         armv7)
             EXTRA_FLAGS="--cpu=cortex-a8 --enable-pic"
             EXTRA_CFLAGS="-mfpu=neon"
             PLATFORM="${PLATFORMBASE}/iPhoneOS.platform"
-            IOSSDK=iPhoneOS${IOSSDKVERSION}
+            IOSSDK=iPhoneOS${IOSSDK_VER}
             ;;
         armv7s)
             EXTRA_FLAGS="--cpu=cortex-a9 --enable-pic"
             EXTRA_CFLAGS="-mfpu=neon  -miphoneos-version-min=6.0"
             PLATFORM="${PLATFORMBASE}/iPhoneOS.platform"
-            IOSSDK=iPhoneOS${IOSSDKVERSION}
+            IOSSDK=iPhoneOS${IOSSDK_VER}
             ;;
         i386)
             EXTRA_FLAGS="--enable-pic --disable-asm"
             EXTRA_CFLAGS=""
             PLATFORM="${PLATFORMBASE}/iPhoneSimulator.platform"
-            IOSSDK=iPhoneSimulator${IOSSDKVERSION}
+            IOSSDK=iPhoneSimulator${IOSSDK_VER}
             ;;
         *)
             echo "Unsupported architecture ${ARCH}"

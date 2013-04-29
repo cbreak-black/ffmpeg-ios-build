@@ -15,7 +15,7 @@ cd ..
 
 git submodule update --init ffmpeg
 cd ffmpeg
-git checkout master
+git checkout release/${FFMPEG_VER}
 git pull 
 cd ..
 
