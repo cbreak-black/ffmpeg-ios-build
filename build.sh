@@ -1,9 +1,16 @@
-#!/bin/sh
-
-PLATFORMBASE=$(xcode-select -print-path)"/Platforms"
-IOSSDKVERSION=5.0
+#!/bin/bash
 
 set -e
+
+source config.sh
+
+# Number of CPUs (for make -j)
+NCPU=`sysctl -n hw.ncpu`
+if test x$NJOB = x; then
+    NJOB=$NCPU
+fi
+
+PLATFORMBASE=$(xcode-select -print-path)"/Platforms"
 
 SCRIPT_DIR=$( (cd -P $(dirname $0) && pwd) )
 DIST_DIR_BASE=${DIST_DIR_BASE:="$SCRIPT_DIR/dist"}
@@ -13,8 +20,7 @@ then
   echo "ffmpeg source directory does not exist, run sync.sh"
 fi
 
-#ARCHS=${ARCHS:-"armv6 armv7 i386"}
-ARCHS=${ARCHS:-"armv7 i386"}
+PATH=${SCRIPT_DIR}/gas-preprocessor/:$PATH
 
 for ARCH in $ARCHS
 do
@@ -36,19 +42,25 @@ do
             EXTRA_FLAGS="--cpu=arm1176jzf-s"
             EXTRA_CFLAGS=""
             PLATFORM="${PLATFORMBASE}/iPhoneOS.platform"
-            IOSSDK=iPhoneOS${IOSSDKVERSION}
+            IOSSDK=iPhoneOS${IOSSDK_VER}
             ;;
         armv7)
             EXTRA_FLAGS="--cpu=cortex-a8 --enable-pic"
             EXTRA_CFLAGS="-mfpu=neon"
             PLATFORM="${PLATFORMBASE}/iPhoneOS.platform"
-            IOSSDK=iPhoneOS${IOSSDKVERSION}
+            IOSSDK=iPhoneOS${IOSSDK_VER}
+            ;;
+        armv7s)
+            EXTRA_FLAGS="--cpu=cortex-a9 --enable-pic"
+            EXTRA_CFLAGS="-mfpu=neon  -miphoneos-version-min=6.0"
+            PLATFORM="${PLATFORMBASE}/iPhoneOS.platform"
+            IOSSDK=iPhoneOS${IOSSDK_VER}
             ;;
         i386)
-            EXTRA_FLAGS="--enable-pic"
+            EXTRA_FLAGS="--enable-pic --disable-asm"
             EXTRA_CFLAGS=""
             PLATFORM="${PLATFORMBASE}/iPhoneSimulator.platform"
-            IOSSDK=iPhoneSimulator${IOSSDKVERSION}
+            IOSSDK=iPhoneSimulator${IOSSDK_VER}
             ;;
         *)
             echo "Unsupported architecture ${ARCH}"
@@ -77,7 +89,7 @@ do
 
     echo "Installing ffmpeg for $ARCH..."
     make clean
-    make -j8 V=1
+    make -j$NJOB V=1
     make install
 
     cd $SCRIPT_DIR

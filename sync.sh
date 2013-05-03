@@ -2,19 +2,22 @@
 
 set -e
 
+source config.sh
+
 SCRIPT_DIR=$( (cd -P $(dirname $0) && pwd) )
 DIST_DIR_BASE=${DIST_DIR_BASE:="$SCRIPT_DIR/dist"}
 
-if [ -d ffmpeg ]
-then
-  echo "Found ffmpeg source directory, no need to fetch from git..."
-else
-  echo "Fetching ffmpeg from git://git.videolan.org/ffmpeg.git..."
-  git submodule update --init ffmpeg
-fi
+git submodule update --init gas-preprocessor
+cd gas-preprocessor
+git checkout master
+git pull 
+cd ..
 
-#ARCHS=${ARCHS:-"armv6 armv7 i386"}
-ARCHS=${ARCHS:-"armv7 i386"}
+git submodule update --init ffmpeg
+cd ffmpeg
+git checkout release/${FFMPEG_VER}
+git pull 
+cd ..
 
 for ARCH in $ARCHS
 do
